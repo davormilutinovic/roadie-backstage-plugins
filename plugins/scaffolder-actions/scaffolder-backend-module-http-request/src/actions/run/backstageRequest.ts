@@ -24,7 +24,8 @@ export function createHttpBackstageAction(options: {
   discovery: DiscoveryApi;
   auth?: AuthService;
 }) {
-  const { discovery, auth } = options;
+  // const { discovery, auth } = options;
+  const { discovery } = options;
   return createTemplateAction<{
     path: string;
     method: Methods;
@@ -115,10 +116,16 @@ export function createHttpBackstageAction(options: {
 
     async handler(ctx) {
       const { input } = ctx;
-      const { token } = (await auth?.getPluginRequestToken({
-        onBehalfOf: await ctx.getInitiatorCredentials(),
-        targetPluginId: 'proxy',
-      })) ?? { token: ctx.secrets?.backstageToken };
+      // const { token } = (await auth?.getPluginRequestToken({
+      //   onBehalfOf: await ctx.getInitiatorCredentials(),
+      //   targetPluginId: 'proxy',
+      // })) ?? { token: ctx.secrets?.backstageToken };
+
+      const credentials = await ctx.getInitiatorCredentials();
+
+      // @ts-expect-error
+      const token = credentials.token;
+
       const { method, params } = input;
       const logRequestPath = input.logRequestPath ?? true;
       const continueOnBadResponse = input.continueOnBadResponse || false;
